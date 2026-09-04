@@ -21,10 +21,10 @@ class SkipList {
 private:
     int maxLevel;
     int currentLevel;
-    Node* header;
+    Node* header;  // 哨兵节点
     float probability;
     
-    int randomLevel() {
+    int randomLevel() {  // 随机生成节点的层数
         int level = 1;
         while ((rand() / (double)RAND_MAX) < probability && level < maxLevel) {
             level++;
@@ -36,7 +36,7 @@ public:
     SkipList(int maxLevel = 16, float p = 0.5) 
         : maxLevel(maxLevel), currentLevel(1), probability(p) {
         header = new Node(-1, "", maxLevel);
-        srand(time(0));
+        srand(time(0));  // 用时间初始化种子
     }
     
     ~SkipList() {
@@ -48,8 +48,8 @@ public:
         }
     }
     
-    void insert(int key, string value) {
-        vector<Node*> update(maxLevel, nullptr);
+    void insert(int key, string value) {  // 插入一个节点
+        vector<Node*> update(maxLevel, nullptr);  // 存目标key的前驱节点
         Node* current = header;
         
         for (int i = currentLevel - 1; i >= 0; i--) {
@@ -60,14 +60,14 @@ public:
         }
         
         if (update[0]->forward[0] && update[0]->forward[0]->key == key) {
-            update[0]->forward[0]->value = value;
+            update[0]->forward[0]->value = value;  // key已经存在，直接修改value
             return;
         }
         
         int newLevel = randomLevel();
         if (newLevel > currentLevel) {
             for (int i = currentLevel; i < newLevel; i++) {
-                update[i] = header;
+                update[i] = header;  // 补充前驱节点是header的情况
             }
             currentLevel = newLevel;
         }
@@ -80,7 +80,7 @@ public:
         }
     }
     
-    bool find(int key, string& value) {
+    bool find(int key, string& value) {  // 查找跳表中键为key的节点的value
         Node* current = header;
         
         for (int i = currentLevel - 1; i >= 0; i--) {
@@ -90,13 +90,13 @@ public:
         }
         
         if (current->forward[0] && current->forward[0]->key == key) {
-            value = current->forward[0]->value;
+            value = current->forward[0]->value;  // 返回value
             return true;
         }
         return false;
     }
     
-    bool remove(int key) {
+    bool remove(int key) {  // 移除跳表中键为key的节点
         vector<Node*> update(maxLevel, nullptr);
         Node* current = header;
         
@@ -110,7 +110,7 @@ public:
         Node* target = update[0]->forward[0];
         if (target && target->key == key) {
             for (int i = 0; i < currentLevel; i++) {
-                if (update[i]->forward[i] == target) {
+                if (update[i]->forward[i] == target) {  // 要先做判断，再更新forward[i]
                     update[i]->forward[i] = target->forward[i];
                 }
             }
@@ -124,7 +124,7 @@ public:
         return false;
     }
     
-    void display() {
+    void display() {  // 显示跳表中节点的 key、value
         Node* current = header->forward[0];
         while (current) {
             cout << current->key << ": " << current->value << endl;
