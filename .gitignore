@@ -1,0 +1,6 @@
+*.log
+main
+kvTest
+skiplistTest
+wal_test
+*.save
